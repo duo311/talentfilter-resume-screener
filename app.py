@@ -106,12 +106,17 @@ with st.sidebar:
         prov_key = "openai"
         st.caption("Get key at [platform.openai.com](https://platform.openai.com)")
 
-    api_key = st.text_input(
-        "API Key",
-        type="password",
-        placeholder="AIza... (Gemini)  or  sk-ant-...  or  sk-...",
-        help="Your API key — never stored server-side.",
-    )
+    _secrets_map = {
+        "gemini":    "GEMINI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "openai":    "OPENAI_API_KEY",
+    }
+    api_key = st.secrets.get(_secrets_map.get(prov_key, ""), "")
+
+    if not api_key:
+        st.warning(" API key not found in secrets.toml")
+    else:
+        st.success(" API key loaded")
 
     model_override = st.text_input(
         "Model (optional override)",
