@@ -31,7 +31,7 @@ from src.utils import (
 # ─────────────────────────── Page config ────────────────────────────
 st.set_page_config(
     page_title="TalentFilter by Kaushik P",
-    page_icon="🔍",
+    page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -39,34 +39,399 @@ st.set_page_config(
 # ─────────────────────────── Custom CSS ─────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    .main-header {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        padding: 2rem 2.5rem; border-radius: 12px;
-        margin-bottom: 1.5rem; color: white;
-    }
-    .main-header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; }
-    .main-header p  { margin: 0.3rem 0 0; opacity: 0.8; font-size: 1rem; }
-
-    .metric-card {
-        background: white; border: 1px solid #e8ecef;
-        border-radius: 10px; padding: 1.2rem 1.5rem;
-        text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    }
-    .metric-card .value { font-size: 2rem; font-weight: 700; color: #302b63; }
-    .metric-card .label { font-size: 0.85rem; color: #6b7280; margin-top: 2px; }
-
-    .gemini-badge {
-        background: linear-gradient(135deg, #4285f4, #34a853);
-        color: white; padding: 4px 12px; border-radius: 20px;
-        font-size: 0.8rem; font-weight: 600; display: inline-block;
-        margin-bottom: 8px;
+    :root {
+        --bg-primary: #0a0a0f;
+        --bg-card: #12121a;
+        --bg-card-hover: #1a1a28;
+        --bg-surface: #16161f;
+        --border: #1e1e2e;
+        --border-hover: #2d2d44;
+        --text-primary: #e8e8ed;
+        --text-secondary: #8b8b9e;
+        --text-muted: #5a5a72;
+        --accent: #6c63ff;
+        --accent-soft: rgba(108, 99, 255, 0.12);
+        --green: #34d399;
+        --green-soft: rgba(52, 211, 153, 0.12);
+        --blue: #60a5fa;
+        --blue-soft: rgba(96, 165, 250, 0.12);
+        --amber: #fbbf24;
+        --amber-soft: rgba(251, 191, 36, 0.12);
+        --red: #f87171;
+        --red-soft: rgba(248, 113, 113, 0.12);
     }
 
-    div[data-testid="stExpander"] { border: 1px solid #e5e7eb; border-radius: 10px; }
-    .stButton>button { border-radius: 8px; font-weight: 600; }
+    html, body, [class*="css"] {
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text-primary);
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2d2d44; border-radius: 3px; }
+
+    /* ── Hide default Streamlit branding ── */
+    #MainMenu, footer, header { visibility: hidden; }
+    .stDeployButton { display: none; }
+
+    /* ── Main background ── */
+    .stApp { background: var(--bg-primary); }
+    section[data-testid="stSidebar"] {
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
+    }
+    section[data-testid="stSidebar"] .stMarkdown p,
+    section[data-testid="stSidebar"] .stMarkdown span,
+    section[data-testid="stSidebar"] label {
+        color: var(--text-secondary) !important;
+    }
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: var(--text-primary) !important;
+    }
+
+    /* ── Hero Header ── */
+    .hero {
+        position: relative;
+        padding: 2.5rem 2.8rem 2rem;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), var(--green), var(--blue));
+        border-radius: 16px 16px 0 0;
+    }
+    .hero-icon {
+        width: 44px; height: 44px;
+        background: var(--accent-soft);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    .hero h1 {
+        margin: 0; font-size: 1.75rem; font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.03em;
+    }
+    .hero p {
+        margin: 0.4rem 0 0; font-size: 0.92rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+    .hero-tag {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 4px 14px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    /* ── Cards ── */
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    .stat-card:hover {
+        border-color: var(--border-hover);
+        background: var(--bg-card-hover);
+    }
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.1;
+    }
+    .stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 500;
+    }
+
+    /* ── Candidate card ── */
+    .candidate-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 1rem;
+    }
+    .candidate-rank {
+        width: 36px; height: 36px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .candidate-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .candidate-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    /* ── Badges ── */
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+    .badge-green { background: var(--green-soft); color: var(--green); }
+    .badge-blue  { background: var(--blue-soft);  color: var(--blue); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .badge-red   { background: var(--red-soft);    color: var(--red); }
+
+    /* ── Score pill ── */
+    .score-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border-radius: 100px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    /* ── Skill chips ── */
+    .skill-chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin: 2px 3px;
+    }
+    .skill-match { background: var(--green-soft); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+    .skill-miss  { background: var(--red-soft);   color: var(--red);   border: 1px solid rgba(248,113,113,0.2); }
+
+    /* ── Score bar ── */
+    .score-bar-container {
+        background: var(--bg-surface);
+        border-radius: 6px;
+        height: 8px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+    .score-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.6s ease;
+    }
+
+    /* ── Dimension label row ── */
+    .dim-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+    }
+    .dim-label {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    .dim-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    /* ── Section titles ── */
+    .section-title {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin: 1.2rem 0 0.6rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Quote block ── */
+    .quote-block {
+        background: var(--bg-surface);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        margin: 0.5rem 0;
+    }
+
+    /* ── Sidebar badges ── */
+    .provider-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px;
+        border-radius: 100px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: var(--green-soft);
+        color: var(--green);
+        margin-bottom: 10px;
+    }
+
+    /* ── Footer ── */
+    .app-footer {
+        text-align: center;
+        padding: 2rem 0 1rem;
+        border-top: 1px solid var(--border);
+        margin-top: 3rem;
+    }
+    .app-footer p {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+    .app-footer a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+    .app-footer a:hover { text-decoration: underline; }
+
+    /* ── Streamlit overrides ── */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 4px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        padding: 8px 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+    .stTabs [aria-selected="true"] {
+        background: var(--accent-soft) !important;
+        color: var(--accent) !important;
+        font-weight: 600;
+    }
+    .stTabs [data-baseweb="tab-highlight"] { display: none; }
+    .stTabs [data-baseweb="tab-border"] { display: none; }
+
+    div[data-testid="stExpander"] {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+    div[data-testid="stExpander"]:hover {
+        border-color: var(--border-hover);
+    }
+    div[data-testid="stExpander"] summary span {
+        color: var(--text-primary) !important;
+        font-weight: 500;
+    }
+
+    .stTextArea textarea, .stTextInput input {
+        background: var(--bg-surface) !important;
+        border-color: var(--border) !important;
+        color: var(--text-primary) !important;
+        border-radius: 10px !important;
+    }
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 1px var(--accent) !important;
+    }
+
+    .stButton>button[kind="primary"] {
+        background: var(--accent) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1.5rem !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton>button[kind="primary"]:hover {
+        background: #5a52e0 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25) !important;
+    }
+    .stButton>button {
+        border-radius: 10px !important;
+        font-weight: 500 !important;
+        border-color: var(--border) !important;
+        color: var(--text-secondary) !important;
+        background: var(--bg-card) !important;
+    }
+
+    .stDownloadButton>button {
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        color: var(--text-secondary) !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+    }
+    .stDownloadButton>button:hover {
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+    }
+
+    .stDataFrame { border-radius: 12px; overflow: hidden; }
+    div[data-testid="stDataFrame"] > div {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+
+    .stProgress > div > div { background-color: var(--bg-surface) !important; border-radius: 8px; }
+    .stProgress > div > div > div { background: linear-gradient(90deg, var(--accent), var(--green)) !important; border-radius: 8px; }
+
+    div[data-testid="stMetricValue"] {
+        color: var(--text-primary) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+    div[data-testid="stMetricLabel"] label {
+        color: var(--text-muted) !important;
+    }
+
+    hr { border-color: var(--border) !important; }
+
+    .stSlider label { color: var(--text-secondary) !important; }
+    
+    .stFileUploader {
+        background: var(--bg-surface);
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -78,27 +443,29 @@ if "history" not in st.session_state:
 
 # ─────────────────────────── Header ─────────────────────────────────
 st.markdown("""
-<div class="main-header">
-  <h1>🔍 TalentFilter</h1>
-  <p>LLM-powered candidate ranking — upload resumes, describe the role, get instant scores.</p>
+<div class="hero">
+  <div class="hero-icon">🎯</div>
+  <h1>TalentFilter</h1>
+  <p>Screen resumes with AI precision — upload candidates, define the role, get ranked scores in seconds.</p>
+  <span class="hero-tag">AI-Powered Hiring Intelligence</span>
 </div>
 """, unsafe_allow_html=True)
 
 
 # ═══════════════════════════ SIDEBAR ════════════════════════════════
 with st.sidebar:
-    st.header("⚙️ Configuration")
+    st.markdown("### Configuration")
 
     # -- Provider selection --
     provider = st.selectbox(
         "AI Provider",
         ["Google Gemini (FREE ✅)", "Anthropic (Claude)", "OpenAI (GPT)"],
-        index=0,   # Gemini is default
+        index=0,
     )
 
     if "Gemini" in provider:
         prov_key = "gemini"
-        st.markdown('<div class="gemini-badge">🆓 Free Tier — No billing needed</div>', unsafe_allow_html=True)
+        st.markdown('<div class="provider-badge">✦ Free Tier — No billing</div>', unsafe_allow_html=True)
         st.caption("Get your free key at [aistudio.google.com](https://aistudio.google.com) → Get API Key")
     elif "Anthropic" in provider:
         prov_key = "anthropic"
@@ -121,9 +488,9 @@ with st.sidebar:
         api_key = os.environ.get(_secret_name, "")
 
     if not api_key:
-        st.warning(" API key not found in secrets.toml")
+        st.warning("API key not found")
     else:
-        st.success(" API key loaded")
+        st.success("API key loaded")
 
     model_override = st.text_input(
         "Model (optional override)",
@@ -134,8 +501,8 @@ with st.sidebar:
     st.divider()
 
     # -- Scoring weights --
-    st.subheader("🎚️ Scoring Weights")
-    st.caption("Adjust how much each dimension contributes to the final score.")
+    st.markdown("### Scoring Weights")
+    st.caption("Tune each dimension's contribution to the overall score.")
     w_skills  = st.slider("Skills Match",  0, 100, 40)
     w_exp     = st.slider("Experience",    0, 100, 30)
     w_edu     = st.slider("Education",     0, 100, 15)
@@ -146,21 +513,21 @@ with st.sidebar:
         st.error("At least one weight must be > 0.")
     else:
         st.caption(
-            f"Effective: Skills {w_skills/total_w:.0%} · "
+            f"Skills {w_skills/total_w:.0%} · "
             f"Exp {w_exp/total_w:.0%} · "
             f"Edu {w_edu/total_w:.0%} · "
             f"Fit {w_culture/total_w:.0%}"
         )
 
     st.divider()
-    st.subheader("📁 Sample Data")
-    if st.button("Generate sample resumes", use_container_width=True):
+    st.markdown("### Quick Start")
+    if st.button("Load sample data", use_container_width=True):
         st.session_state.load_samples = True
 
 
 # ═══════════════════════════ MAIN TABS ══════════════════════════════
 tab_screen, tab_results, tab_history = st.tabs(
-    ["📋 Screen Resumes", "📊 Results", "🗂️ History"]
+    ["Screen", "Results", "History"]
 )
 
 # ──────────────────── TAB 1: Screen Resumes ─────────────────────────
@@ -168,7 +535,7 @@ with tab_screen:
     col_jd, col_up = st.columns([1, 1], gap="large")
 
     with col_jd:
-        st.subheader("📝 Job Description")
+        st.markdown("##### Job Description")
         sample_jd = ""
         if st.session_state.get("load_samples"):
             sample_jd = """Senior Python Developer
@@ -192,28 +559,29 @@ Nice to have:
 Education: Bachelor's or Master's degree in Computer Science or equivalent."""
 
         job_description = st.text_area(
-            "Paste the job description here",
+            "Paste the full job description",
             value=sample_jd,
             height=350,
             placeholder="Paste or type the full job description…",
+            label_visibility="collapsed",
         )
         if job_description:
-            st.caption(f"📏 ~{estimate_tokens(job_description)} tokens")
+            st.caption(f"~{estimate_tokens(job_description)} tokens")
 
     with col_up:
-        st.subheader("📂 Upload Resumes")
+        st.markdown("##### Upload Resumes")
         uploaded_files = st.file_uploader(
             "Choose resume files (PDF, DOCX, TXT)",
             type=["pdf", "docx", "txt"],
             accept_multiple_files=True,
         )
         if uploaded_files:
-            st.success(f"✅ {len(uploaded_files)} file(s) ready")
+            st.success(f"{len(uploaded_files)} file(s) ready")
             for f in uploaded_files:
-                st.caption(f"• {f.name} ({len(f.getvalue())/1024:.1f} KB)")
+                st.caption(f"› {f.name} ({len(f.getvalue())/1024:.1f} KB)")
 
         if st.session_state.get("load_samples"):
-            st.info("💡 Sample resumes loaded — click **Start Screening** to test.")
+            st.info("Sample resumes loaded — click **Start Screening** to test.")
             st.session_state.load_samples = False
 
     st.divider()
@@ -221,7 +589,7 @@ Education: Bachelor's or Master's degree in Computer Science or equivalent."""
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
         start_btn = st.button(
-            "🚀 Start Screening",
+            "Start Screening →",
             use_container_width=True,
             type="primary",
             disabled=not (job_description),
@@ -242,16 +610,14 @@ Education: Bachelor's or Master's degree in Computer Science or equivalent."""
         if uploaded_files:
             for uf in uploaded_files:
                 try:
-                    # Windows-safe temp path
                     tmp = Path(tempfile.gettempdir()) / uf.name
                     tmp.write_bytes(uf.getvalue())
                     texts[uf.name] = extractor.extract(tmp)
                     tmp.unlink(missing_ok=True)
                 except Exception as e:
-                    st.warning(f"⚠️ Could not extract '{uf.name}': {e}")
+                    st.warning(f"Could not extract '{uf.name}': {e}")
 
         if not texts:
-            # Built-in sample resumes for demo / testing
             texts = {
                 "alice_chen_senior.txt": """Alice Chen | alice@email.com
 Senior Software Engineer — 7 years experience
@@ -330,7 +696,7 @@ Certifications: Python Basics (Coursera 2023)""",
                 progress_callback=update_progress,
             )
 
-        progress_bar.progress(1.0, text="✅ Screening complete!")
+        progress_bar.progress(1.0, text="Screening complete")
         status_text.empty()
 
         st.session_state.session_results = session
@@ -343,11 +709,11 @@ Certifications: Python Basics (Coursera 2023)""",
         })
 
         st.success(
-            f"🎉 Screened {len(session.results)} resume(s) in "
+            f"Screened {len(session.results)} resume(s) in "
             f"{format_duration(session.elapsed_seconds)} · "
             f"{session.total_tokens:,} tokens used"
         )
-        st.info("Go to the **Results** tab to view rankings.")
+        st.info("Switch to the **Results** tab to see rankings.")
 
 
 # ──────────────────── TAB 2: Results ────────────────────────────────
@@ -355,23 +721,35 @@ with tab_results:
     session = st.session_state.session_results
 
     if session is None:
-        st.info("Run a screening session to see results here.")
+        st.markdown("""
+        <div style="text-align:center; padding: 4rem 2rem;">
+            <div style="font-size:2.5rem; margin-bottom:1rem;">📭</div>
+            <p style="color:var(--text-muted); font-size:0.95rem;">No results yet. Run a screening session to see rankings here.</p>
+        </div>
+        """, unsafe_allow_html=True)
     else:
         ranked = session.ranked
 
-        # Summary metric cards
-        mc = st.columns(4)
+        # Summary stat cards
         counts = {"Strong Yes": 0, "Yes": 0, "Maybe": 0, "No": 0}
         for r in ranked:
             counts[r.recommendation] = counts.get(r.recommendation, 0) + 1
 
-        colours = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"]
-        for col, (label, colour) in zip(mc, zip(counts.keys(), colours)):
+        badge_map = {
+            "Strong Yes": ("var(--green)", "badge-green"),
+            "Yes": ("var(--blue)", "badge-blue"),
+            "Maybe": ("var(--amber)", "badge-amber"),
+            "No": ("var(--red)", "badge-red"),
+        }
+
+        mc = st.columns(4)
+        for col, (label, count) in zip(mc, counts.items()):
+            color, _ = badge_map[label]
             with col:
                 st.markdown(f"""
-                <div class="metric-card">
-                  <div class="value" style="color:{colour}">{counts[label]}</div>
-                  <div class="label">{label}</div>
+                <div class="stat-card">
+                  <div class="stat-value" style="color:{color}">{count}</div>
+                  <div class="stat-label">{label}</div>
                 </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
@@ -379,31 +757,44 @@ with tab_results:
         # Score bar chart
         if ranked:
             colour_map = {
-                "Strong Yes": "#10b981", "Yes": "#3b82f6",
-                "Maybe": "#f59e0b", "No": "#ef4444",
+                "Strong Yes": "#34d399", "Yes": "#60a5fa",
+                "Maybe": "#fbbf24", "No": "#f87171",
             }
             fig = go.Figure(go.Bar(
                 x=[r.overall_score for r in ranked],
-                y=[r.filename[:30] for r in ranked],
+                y=[r.filename[:28] for r in ranked],
                 orientation="h",
-                marker_color=[colour_map.get(r.recommendation, "#6b7280") for r in ranked],
+                marker_color=[colour_map.get(r.recommendation, "#5a5a72") for r in ranked],
+                marker_line_width=0,
                 text=[f"{r.overall_score:.1f}" for r in ranked],
                 textposition="outside",
+                textfont=dict(family="JetBrains Mono", size=12, color="#e8e8ed"),
             ))
             fig.update_layout(
-                xaxis=dict(range=[0, 115], title="Score (0–100)"),
-                yaxis=dict(autorange="reversed"),
-                height=max(250, len(ranked) * 55 + 80),
-                margin=dict(l=0, r=50, t=30, b=30),
-                plot_bgcolor="white", paper_bgcolor="white",
+                xaxis=dict(range=[0, 115], title="Score (0–100)",
+                           gridcolor="#1e1e2e", zerolinecolor="#1e1e2e",
+                           tickfont=dict(color="#5a5a72"),
+                           titlefont=dict(color="#5a5a72", size=11)),
+                yaxis=dict(autorange="reversed",
+                           tickfont=dict(color="#8b8b9e", size=11)),
+                height=max(220, len(ranked) * 55 + 60),
+                margin=dict(l=0, r=60, t=20, b=40),
+                plot_bgcolor="#0a0a0f",
+                paper_bgcolor="#0a0a0f",
             )
-            fig.add_vline(x=80, line_dash="dot", line_color="#10b981", annotation_text="Strong Yes ≥80")
-            fig.add_vline(x=65, line_dash="dot", line_color="#3b82f6", annotation_text="Yes ≥65")
-            fig.add_vline(x=45, line_dash="dot", line_color="#f59e0b", annotation_text="Maybe ≥45")
+            fig.add_vline(x=80, line_dash="dot", line_color="rgba(52,211,153,0.3)",
+                         annotation_text="Strong Yes", annotation_font_color="#34d399",
+                         annotation_font_size=10)
+            fig.add_vline(x=65, line_dash="dot", line_color="rgba(96,165,250,0.3)",
+                         annotation_text="Yes", annotation_font_color="#60a5fa",
+                         annotation_font_size=10)
+            fig.add_vline(x=45, line_dash="dot", line_color="rgba(251,191,36,0.3)",
+                         annotation_text="Maybe", annotation_font_color="#fbbf24",
+                         annotation_font_size=10)
             st.plotly_chart(fig, use_container_width=True)
 
-        # Results table
-        st.subheader("📋 Ranked Candidates")
+        # Ranked candidates table
+        st.markdown('<div class="section-title">Ranked Candidates</div>', unsafe_allow_html=True)
         rows = []
         for rank, r in enumerate(ranked, 1):
             rows.append({
@@ -428,54 +819,98 @@ with tab_results:
             )
 
         # Candidate detail expanders
-        st.subheader("🔎 Candidate Details")
+        st.markdown('<div class="section-title">Candidate Details</div>', unsafe_allow_html=True)
+
         for rank, r in enumerate(ranked, 1):
-            with st.expander(f"#{rank} · {r.filename}  —  Score: {r.overall_score:.1f}  · {r.recommendation}"):
+            rec_badge = badge_map.get(r.recommendation, ("var(--text-muted)", "badge-red"))
+            badge_class = rec_badge[1]
+
+            with st.expander(f"#{rank} · {r.filename}  —  {r.overall_score:.1f}  · {r.recommendation}"):
                 if r.error:
                     st.error(f"Error: {r.error}")
                     continue
 
+                # Header with rank badge
+                st.markdown(f"""
+                <div class="candidate-header">
+                    <div class="candidate-rank">#{rank}</div>
+                    <div>
+                        <div class="candidate-name">{r.filename}</div>
+                        <div class="candidate-meta">{r.years_of_experience:.0f} yrs · {r.education_level or 'N/A'} · <span class="badge {badge_class}">{r.recommendation}</span></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
                 dcol1, dcol2 = st.columns(2)
+
                 with dcol1:
-                    st.markdown("**📊 Dimension Scores**")
-                    for dim, score in [
-                        ("Skills", r.skills_score),
-                        ("Experience", r.experience_score),
-                        ("Education", r.education_score),
-                        ("Cultural Fit", r.cultural_fit_score),
-                    ]:
-                        st.metric(dim, f"{score:.0f}/100")
+                    # Dimension scores as custom bars
+                    st.markdown('<div class="section-title">Dimension Scores</div>', unsafe_allow_html=True)
+                    dims = [
+                        ("Skills", r.skills_score, "var(--accent)"),
+                        ("Experience", r.experience_score, "var(--green)"),
+                        ("Education", r.education_score, "var(--blue)"),
+                        ("Cultural Fit", r.cultural_fit_score, "var(--amber)"),
+                    ]
+                    for dim_name, dim_score, dim_color in dims:
+                        st.markdown(f"""
+                        <div class="dim-row">
+                            <span class="dim-label">{dim_name}</span>
+                            <span class="dim-value">{dim_score:.0f}</span>
+                        </div>
+                        <div class="score-bar-container">
+                            <div class="score-bar-fill" style="width:{dim_score}%; background:{dim_color};"></div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                 with dcol2:
-                    st.markdown("**👤 Candidate Info**")
-                    st.write(f"**Experience:** {r.years_of_experience} years")
-                    st.write(f"**Education:** {r.education_level or 'Not specified'}")
+                    # Skills chips
                     if r.matched_skills:
-                        st.write(f"**✅ Matched:** {', '.join(r.matched_skills[:5])}")
-                    if r.missing_skills:
-                        st.write(f"**❌ Missing:** {', '.join(r.missing_skills[:5])}")
+                        st.markdown('<div class="section-title">Matched Skills</div>', unsafe_allow_html=True)
+                        chips = "".join(f'<span class="skill-chip skill-match">{s}</span>' for s in r.matched_skills[:8])
+                        st.markdown(chips, unsafe_allow_html=True)
 
-                st.markdown("**📝 Summary**")
-                st.info(r.summary)
-                st.markdown("**⚖️ Justification**")
-                st.warning(r.justification)
+                    if r.missing_skills:
+                        st.markdown('<div class="section-title">Missing Skills</div>', unsafe_allow_html=True)
+                        chips = "".join(f'<span class="skill-chip skill-miss">{s}</span>' for s in r.missing_skills[:8])
+                        st.markdown(chips, unsafe_allow_html=True)
+
+                # Summary & Justification
+                st.markdown('<div class="section-title">Summary</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="quote-block">{r.summary}</div>', unsafe_allow_html=True)
+
+                st.markdown('<div class="section-title">Justification</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="quote-block">{r.justification}</div>', unsafe_allow_html=True)
 
                 # Radar chart
                 cats = ["Skills", "Experience", "Education", "Cultural Fit"]
                 vals = [r.skills_score, r.experience_score, r.education_score, r.cultural_fit_score]
                 fig_r = go.Figure(go.Scatterpolar(
                     r=vals + [vals[0]], theta=cats + [cats[0]],
-                    fill="toself", fillcolor="rgba(48,43,99,.2)",
-                    line_color="#302b63",
+                    fill="toself",
+                    fillcolor="rgba(108, 99, 255, 0.15)",
+                    line_color="#6c63ff",
+                    line_width=2,
                 ))
                 fig_r.update_layout(
-                    polar=dict(radialaxis=dict(range=[0, 100])),
-                    height=280, margin=dict(l=40, r=40, t=30, b=30),
-                    paper_bgcolor="white",
+                    polar=dict(
+                        radialaxis=dict(
+                            range=[0, 100], showticklabels=False,
+                            gridcolor="#1e1e2e", linecolor="#1e1e2e",
+                        ),
+                        angularaxis=dict(
+                            gridcolor="#1e1e2e", linecolor="#1e1e2e",
+                            tickfont=dict(color="#8b8b9e", size=11),
+                        ),
+                        bgcolor="#0a0a0f",
+                    ),
+                    height=260,
+                    margin=dict(l=50, r=50, t=25, b=25),
+                    paper_bgcolor="#12121a",
                 )
                 st.plotly_chart(fig_r, use_container_width=True)
 
-        # Export
+        # Export buttons
         st.divider()
         if ranked:
             from io import StringIO
@@ -501,13 +936,13 @@ with tab_results:
             c1, c2 = st.columns(2)
             with c1:
                 st.download_button(
-                    "⬇️ Download CSV", data=buf.getvalue(),
+                    "Download CSV", data=buf.getvalue(),
                     file_name="screening_results.csv", mime="text/csv",
                     use_container_width=True,
                 )
             with c2:
                 st.download_button(
-                    "⬇️ Download JSON",
+                    "Download JSON",
                     data=json.dumps({"results": [r.to_dict() for r in ranked]}, indent=2),
                     file_name="screening_results.json", mime="application/json",
                     use_container_width=True,
@@ -516,20 +951,25 @@ with tab_results:
 
 # ──────────────────── TAB 3: History ────────────────────────────────
 with tab_history:
-    st.subheader("🗂️ Screening History")
     if not st.session_state.history:
-        st.info("No sessions yet — run a screening to see history here.")
+        st.markdown("""
+        <div style="text-align:center; padding: 4rem 2rem;">
+            <div style="font-size:2.5rem; margin-bottom:1rem;">🕐</div>
+            <p style="color:var(--text-muted); font-size:0.95rem;">No sessions yet — run a screening to see history here.</p>
+        </div>
+        """, unsafe_allow_html=True)
     else:
+        st.markdown('<div class="section-title">Screening History</div>', unsafe_allow_html=True)
         df_h = pd.DataFrame(st.session_state.history)
         df_h.index = range(1, len(df_h) + 1)
         st.dataframe(df_h, use_container_width=True)
-        if st.button("🗑️ Clear history"):
+        if st.button("Clear history"):
             st.session_state.history = []
             st.rerun()
 
 # ──────────────────── Footer ─────────────────────────────────────────
-st.markdown("---")
-st.caption(
-    "TalentFilter · Designed & built by Kaushik P · "
-    "github.com/duo311"
-)
+st.markdown("""
+<div class="app-footer">
+    <p>TalentFilter · Built by <a href="https://github.com/duo311" target="_blank">Kaushik P</a></p>
+</div>
+""", unsafe_allow_html=True)
