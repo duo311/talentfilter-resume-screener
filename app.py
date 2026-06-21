@@ -113,7 +113,12 @@ with st.sidebar:
         "openai":    "OPENAI_API_KEY",
     }
     _secret_name = _secrets_map.get(prov_key, "")
-    api_key = st.secrets.get(_secret_name, "") or os.environ.get(_secret_name, "")
+    try:
+        api_key = st.secrets.get(_secret_name, "")
+    except Exception:
+        api_key = ""
+    if not api_key:
+        api_key = os.environ.get(_secret_name, "")
 
     if not api_key:
         st.warning(" API key not found in secrets.toml")
