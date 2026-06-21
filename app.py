@@ -771,10 +771,10 @@ with tab_results:
                 textfont=dict(family="JetBrains Mono", size=12, color="#e8e8ed"),
             ))
             fig.update_layout(
-                xaxis=dict(range=[0, 115], title="Score (0–100)",
+                xaxis=dict(range=[0, 115],
+                           title=dict(text="Score (0–100)", font=dict(color="#5a5a72", size=11)),
                            gridcolor="#1e1e2e", zerolinecolor="#1e1e2e",
-                           tickfont=dict(color="#5a5a72"),
-                           titlefont=dict(color="#5a5a72", size=11)),
+                           tickfont=dict(color="#5a5a72")),
                 yaxis=dict(autorange="reversed",
                            tickfont=dict(color="#8b8b9e", size=11)),
                 height=max(220, len(ranked) * 55 + 60),
