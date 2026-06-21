@@ -1,4 +1,4 @@
-﻿"""
+"""
 app.py — Streamlit frontend for TalentFilter Resume Screener.
 Supports Anthropic Claude, OpenAI GPT, and Google Gemini (FREE).
 
@@ -6,6 +6,7 @@ Run with:  streamlit run app.py
 """
 
 import json
+import os
 import sys
 import time
 import tempfile
@@ -111,7 +112,8 @@ with st.sidebar:
         "anthropic": "ANTHROPIC_API_KEY",
         "openai":    "OPENAI_API_KEY",
     }
-    api_key = st.secrets.get(_secrets_map.get(prov_key, ""), "")
+    _secret_name = _secrets_map.get(prov_key, "")
+    api_key = st.secrets.get(_secret_name, "") or os.environ.get(_secret_name, "")
 
     if not api_key:
         st.warning(" API key not found in secrets.toml")
